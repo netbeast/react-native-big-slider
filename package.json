@@ -1,22 +1,29 @@
 {
-	"name": "bigSlider",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "node node_modules/react-native/local-cli/cli.js start",
-		"test": "jest"
-	},
-	"dependencies": {
-		"react": "16.0.0-alpha.12",
-		"react-native": "0.48.4"
-	},
-	"devDependencies": {
-		"babel-jest": "21.2.0",
-		"babel-preset-react-native": "4.0.0",
-		"jest": "21.2.1",
-		"react-test-renderer": "16.0.0-alpha.12"
-	},
-	"jest": {
-		"preset": "react-native"
-	}
+  "name": "react-native-big-slider",
+  "version": "0.1.0",
+  "description": " Yet another, a big, easily customisable and hackable react-native slider component",
+  "main": "BigSlider.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/netbeast/react-native-big-slider.git"
+  },
+  "keywords": [
+    "react-native",
+    "react",
+    "ui",
+    "ux",
+    "slider"
+  ],
+  "author": "jesus@netbeast.co",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/netbeast/react-native-big-slider/issues"
+  },
+  "homepage": "https://github.com/netbeast/react-native-big-slider#readme"
 }
