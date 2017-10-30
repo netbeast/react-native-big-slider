@@ -31,16 +31,18 @@ export default class bigSlider extends Component {
         <View padding={20} flexDirection="row" flex={1}>
           <View flex={1}>
             <BigSlider
+              ref={el => {this.slider = el}}
               horizontal
               maximumValue={120}
               style={{ width: 140 }}
-
+              onSlidingComplete={() => {
+                this.slider.slideTo(80)
+              }}
               value={this.state.valB}
               minimumValue={-120} />
           </View>
           <View flex={1}>
             <BigSlider
-              horizontal
               maximumValue={120}
               style={{ backgroundColor: 'rgba(0,0,0,.7)' }}
               trackStyle={{ backgroundColor: 'rgba(194, 61, 85, 1)' }}

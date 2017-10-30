@@ -25,7 +25,7 @@ export default class BigSlider extends Component {
   constructor(props) {
     super()
     this.state = {
-      value: props.value
+      value: props.value,
     }
 
     this.range = props.maximumValue - props.minimumValue
@@ -43,6 +43,10 @@ export default class BigSlider extends Component {
         this.props.onSlidingComplete()
       },
     })
+  }
+
+  slideTo = (value) => {
+    this.setState({value})
   }
 
   onLayout = ({ nativeEvent }) => {
