@@ -3,73 +3,90 @@
  * @flow
  */
 
-import React, { Component } from 'react';
+
+import React, { Component } from 'react'
 import {
   Animated,
   PanResponder,
   StyleSheet,
   Text,
   View,
-} from 'react-native';
+} from 'react-native'
+
 
 export default class BigSlider extends Component {
   static defaultProps = {
     value: 40,
     maximumValue: 100,
     minimumValue: 0,
-    onSlidingStart: () => {},
-    onValueChange: () => {},
-    onSlidingComplete: () => {},
+    onSlidingStart: () => { },
+    onValueChange: () => { },
+    onSlidingComplete: () => { },
   }
 
-  constructor(props) {
+
+  constructor (props: Object) {
     super()
     this.state = {
+      anchorValue: props.value,
       value: props.value,
+      width: 120, // provisional value
+      height: 360, // provisional value
     }
+
 
     this.range = props.maximumValue - props.minimumValue
   }
 
+  state: {
+    anchorValue: number,
+    value: number,
+    width: number,
+    height: number,
+  }
+
   componentWillMount () {
     this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (e, gestureState) => true,
-      onPanResponderGrant: (evt, gestureState) => {
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
         this.props.onSlidingStart()
         this.setState({ anchorValue: this.state.value })
       },
       onPanResponderMove: Animated.event([null, {}], { listener: this.handleSlide }),
-      onPanResponderRelease: (evt, gestureState) => {
-        this.props.onSlidingComplete()
-      },
+      onPanResponderRelease: () => { this.props.onSlidingComplete() },
     })
   }
 
-  slideTo = (value) => {
-    this.setState({value})
-  }
-
-  onLayout = ({ nativeEvent }) => {
+  onLayout = ({ nativeEvent }: Object) => {
     this.setState({
       width: nativeEvent.layout.width,
       height: nativeEvent.layout.height,
     })
   }
 
-  handleSlide = (evt, gestureState) => {
+  slideTo = (value: number) => {
+    this.setState({ value })
+  }
+
+  handleSlide = (evt: Object, gestureState: Object) => {
     const { maximumValue, minimumValue } = this.props
-    let valueIncrement = (-gestureState.dy * this.range) / this.state.height
+    const valueIncrement = (-gestureState.dy * this.range) / this.state.height
     let nextValue = this.state.anchorValue + valueIncrement
     nextValue = nextValue >= maximumValue ? maximumValue : nextValue
     nextValue = nextValue <= minimumValue ? minimumValue : nextValue
+
 
     this.props.onValueChange(nextValue)
     this.setState({ value: nextValue })
   }
 
+  panResponder: Object
+  range: number
+
   render () {
     const value = this.state.value
     const unitValue = (value - this.props.minimumValue) / this.range
+
 
     return (
       <View
@@ -89,9 +106,10 @@ export default class BigSlider extends Component {
           }
         </View>
       </View>
-    );
+    )
   }
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -129,6 +147,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 })
+
 
 function formatNumber (x) {
   return x.toFixed(1).replace(/\.?0*$/, '')
