@@ -1,6 +1,6 @@
 {
   "name": "react-native-big-slider",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": " Yet another, a big, easily customisable and hackable react-native slider component",
   "main": "BigSlider.js",
   "directories": {
