@@ -5,8 +5,9 @@
 
 import React, { Component } from 'react';
 import {
-  StyleSheet,
+  Animated,
   PanResponder,
+  StyleSheet,
   Text,
   View,
 } from 'react-native';
@@ -16,12 +17,15 @@ export default class BigSlider extends Component {
     value: 40,
     maximumValue: 100,
     minimumValue: 0,
+    onSlidingStart: () => {},
+    onValueChange: () => {},
+    onSlidingComplete: () => {},
   }
 
   constructor(props) {
     super()
     this.state = {
-      value: props.value
+      value: props.value,
     }
 
     this.range = props.maximumValue - props.minimumValue
@@ -31,23 +35,18 @@ export default class BigSlider extends Component {
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (e, gestureState) => true,
       onPanResponderGrant: (evt, gestureState) => {
-        if (typeof this.props.onSlidingStart === 'function') this.props.onSlidingStart()
+        this.props.onSlidingStart()
         this.setState({ anchorValue: this.state.value })
       },
-      onPanResponderMove: (evt, gestureState) => {
-        const { maximumValue, minimumValue } = this.props
-        let valueIncrement = (-gestureState.dy * this.range) / this.state.height
-        let nextValue = this.state.anchorValue + valueIncrement
-        nextValue = nextValue >= maximumValue ? maximumValue : nextValue
-        nextValue = nextValue <= minimumValue ? minimumValue : nextValue
-
-        if (typeof this.props.onValueChange === 'function') this.props.onValueChange(nextValue)
-        this.setState({ value: nextValue })
-      },
+      onPanResponderMove: Animated.event([null, {}], { listener: this.handleSlide }),
       onPanResponderRelease: (evt, gestureState) => {
-        if (typeof this.props.onSlidingComplete === 'function') this.props.onSlidingComplete()
+        this.props.onSlidingComplete()
       },
     })
+  }
+
+  slideTo = (value) => {
+    this.setState({value})
   }
 
   onLayout = ({ nativeEvent }) => {
@@ -55,6 +54,17 @@ export default class BigSlider extends Component {
       width: nativeEvent.layout.width,
       height: nativeEvent.layout.height,
     })
+  }
+
+  handleSlide = (evt, gestureState) => {
+    const { maximumValue, minimumValue } = this.props
+    let valueIncrement = (-gestureState.dy * this.range) / this.state.height
+    let nextValue = this.state.anchorValue + valueIncrement
+    nextValue = nextValue >= maximumValue ? maximumValue : nextValue
+    nextValue = nextValue <= minimumValue ? minimumValue : nextValue
+
+    this.props.onValueChange(nextValue)
+    this.setState({ value: nextValue })
   }
 
   render () {
