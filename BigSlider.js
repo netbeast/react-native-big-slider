@@ -9,6 +9,7 @@ import {Animated, PanResponder, StyleSheet, Text, View} from 'react-native'
 export default class BigSlider extends Component {
   static defaultProps = {
     value: 40,
+    height: 300,
     maximumValue: 100,
     minimumValue: 0,
     onSlidingStart: () => {},
@@ -54,7 +55,7 @@ export default class BigSlider extends Component {
   handleSlide = (evt: Object, gestureState: Object) => {
     const {maximumValue, minimumValue} = this.props
     const valueIncrement =
-      -gestureState.dy * this.range / this.props.layout.height
+      -gestureState.dy * this.range / this.props.height
     let nextValue = this.state.anchorValue + valueIncrement
     nextValue = nextValue >= maximumValue ? maximumValue : nextValue
     nextValue = nextValue <= minimumValue ? minimumValue : nextValue
