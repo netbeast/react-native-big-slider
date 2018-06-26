@@ -3,14 +3,8 @@
  * @flow
  */
 
-import React, { Component } from 'react';
-import {
-  Animated,
-  PanResponder,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, {Component} from 'react'
+import {Animated, PanResponder, StyleSheet, Text, View} from 'react-native'
 
 export default class BigSlider extends Component {
   static defaultProps = {
@@ -22,74 +16,107 @@ export default class BigSlider extends Component {
     onSlidingComplete: () => {},
   }
 
-  constructor(props) {
+  constructor (props: Object) {
     super()
     this.state = {
-      value: props.value,
+      anchorValue: parseFloat(props.value),
+      value: parseFloat(props.value),
     }
 
     this.range = props.maximumValue - props.minimumValue
   }
 
+  state: {
+    anchorValue: number,
+    value: number,
+  }
+
   componentWillMount () {
     this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (e, gestureState) => true,
-      onPanResponderGrant: (evt, gestureState) => {
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
         this.props.onSlidingStart()
-        this.setState({ anchorValue: this.state.value })
+        this.setState({anchorValue: this.state.value})
       },
-      onPanResponderMove: Animated.event([null, {}], { listener: this.handleSlide }),
-      onPanResponderRelease: (evt, gestureState) => {
+      onPanResponderMove: Animated.event([null, {}], {
+        listener: this.handleSlide,
+      }),
+      onPanResponderRelease: () => {
         this.props.onSlidingComplete()
       },
     })
   }
 
-  slideTo = (value) => {
+  slideTo = (value: number) => {
     this.setState({value})
   }
 
-  onLayout = ({ nativeEvent }) => {
-    this.setState({
-      width: nativeEvent.layout.width,
-      height: nativeEvent.layout.height,
-    })
-  }
-
-  handleSlide = (evt, gestureState) => {
-    const { maximumValue, minimumValue } = this.props
-    let valueIncrement = (-gestureState.dy * this.range) / this.state.height
+  handleSlide = (evt: Object, gestureState: Object) => {
+    const {maximumValue, minimumValue} = this.props
+    const valueIncrement =
+      -gestureState.dy * this.range / this.props.layout.height
     let nextValue = this.state.anchorValue + valueIncrement
     nextValue = nextValue >= maximumValue ? maximumValue : nextValue
     nextValue = nextValue <= minimumValue ? minimumValue : nextValue
-
     this.props.onValueChange(nextValue)
-    this.setState({ value: nextValue })
+    this.setState({value: nextValue})
+  }
+
+  panResponder: Object
+  range: number
+
+  renderLabel = () => {
+    if (this.props.noLabel) {
+      return null
+    }
+    if (this.state.value < 30) {
+      return null
+    }
+
+    return this.props.renderLabel ? (
+      this.props.renderLabel()
+    ) : (
+      <View style={styles.trackLabel}>
+        <Text style={[styles.trackLabelText, this.props.labelStyle]}>
+          {this.props.label || `${formatNumber(this.props.value)}%`}
+        </Text>
+      </View>
+    )
+  }
+
+  renderPendingTrackLabel = () => {
+    if (this.props.noPendingTrackLabel || this.state.value >= 30) {
+      return null
+    }
+
+    return this.props.renderPendingTrackLabel ? (
+      this.props.renderPendingTrackLabel()
+    ) : (
+      <View style={styles.trackLabel}>
+        <Text style={styles.trackLabelText}>
+          {this.props.label || `${formatNumber(this.props.value)}%`}
+        </Text>
+      </View>
+    )
   }
 
   render () {
-    const value = this.state.value
+    const {value} = this.state
     const unitValue = (value - this.props.minimumValue) / this.range
 
     return (
       <View
-        onLayout={this.onLayout}
         style={[styles.container, this.props.style]}
         {...this.panResponder.panHandlers}>
-        <View style={[styles.pendingTrack, { flex: 1 - unitValue }]} />
-        <View style={[styles.track, { flex: unitValue }, this.props.trackStyle]}>
-          <View style={styles.thumb} />
-          {this.props.renderLabel
-            ? this.props.renderLabel()
-            : <View style={styles.trackLabel}>
-              <Text style={styles.trackLabelText}>
-                {this.props.label || `${formatNumber(this.props.value)}%`}
-              </Text>
-            </View>
-          }
+        <View style={[styles.pendingTrack, {flex: 1 - unitValue}]}>
+          {this.renderPendingTrackLabel()}
+        </View>
+        <View style={[styles.track, {flex: unitValue}, this.props.trackStyle]}>
+          <View style={[styles.thumb, this.props.thumbStyle]} />
+          {this.renderLabel()}
         </View>
       </View>
-    );
+    )
   }
 }
 
@@ -104,6 +131,8 @@ const styles = StyleSheet.create({
     width: 120,
   },
   pendingTrack: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   track: {
     flex: 1,
@@ -130,6 +159,8 @@ const styles = StyleSheet.create({
   },
 })
 
-function formatNumber (x) {
-  return x.toFixed(1).replace(/\.?0*$/, '')
+function formatNumber (x = 0) {
+  return parseInt(x, 10)
+    .toFixed(1)
+    .replace(/\.?0*$/, '')
 }
